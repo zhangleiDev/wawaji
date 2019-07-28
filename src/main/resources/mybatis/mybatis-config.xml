@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+    <plugins>
+        <!-- 处理Map返回结果,驼峰转换key -->
+        <plugin interceptor="com.zle.plugins.mybatis.ResultSetInterceptor">
+            <property name="pro1" value="hehe"></property>
+            <property name="pro2" value="haha"></property>
+        </plugin>
+
+        <plugin interceptor="com.zle.plugins.mybatis.QueryInterceptor">
+        </plugin>
+    </plugins>
+</configuration>

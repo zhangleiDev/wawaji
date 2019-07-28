@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http ://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace = "com.zle.dao.UserDao2">
+    <!--
+      autoMapping: 自动映射其它字段,默认为true
+    -->
+    <resultMap id="User" autoMapping="true"  type="com.zle.entity.User">
+        <id column="id"       property="id" />
+        <result column="name" property="name"/>
+        <result column="age"  property="age"/>
+        <!--<result column="email"  property="email"/>-->
+    </resultMap>
+<!--
+  1.resultMap 和 resultType都配置时 以resultType为准
+-->
+    <select id="queryAll" resultMap="User" resultType="com.zle.entity.User">
+        select * from user
+         <where>
+             1=1
+             <if test="age!=null">
+                and age > 20
+             and stamp > #{day}
+         </if>
+
+    </where>
+</select>
+    <!---
+        useGeneratedKeys 启用自动生成主键,只适用于主键自增的数据库
+        keyProperty="id" 设置主键为id,主键值会赋值给实体的id字段
+    -->
+    <insert id="insertWithGeneratedKeys" useGeneratedKeys="true" keyProperty="id" parameterType="com.zle.entity.User">
+        insert into user(name,age)
+         values (#{name},#{age})
+    </insert>
+    <!--
+    order 属性的设置和使用的数据库有关 。
+在 MySQL 数据库中， order 属性设置的值是 AFTER，因为当前记录的主键值在 insert 语句
+执行成功后才能获取到 。 而在 Oracle 数据库中， order 的值要设置为 BEFORE ，这是因为 Oracle
+中需要先从序列获取值，然后将值作为主键插入到数据库中 。
+    -->
+    <insert id="insertWithSelectKey" parameterType="com.zle.entity.User">
+        <selectKey keyColumn="id" resultType="int" keyProperty="id" order="AFTER" >
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into user(name,age)
+        values (#{name},#{age})
+    </insert>
+    <!--
+    collection取值:  List<> 默认为list
+                    集合默认为 collection
+                    数组默认为 array
+                    也可以用@Param指定名称
+    MyBatis 3.3.1以后可以使用useGeneratedKeys获取批量生成的自增主键,但是只支持mysql
+    -->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        insert into user(name,age)
+        values
+        <foreach collection="list" item="user"  separator=",">
+            (#{user.name},#{user.age})
+        </foreach>
+    </insert>
+
+    <select id="testSelect2" resultMap="User">
+        select * from user
+        <where>
+            <foreach collection="_parameter" item="val" index="key" separator="and">
+                #{key}=#{val}
+            </foreach>
+        </where>
+    </select>
+    <select id="testSelect3" resultMap="User">
+        select * from user
+        <where>
+            <bind name="nameLike" value="'%'+name+'%'"/>
+            name like #{nameLike}
+        </where>
+    </select>
+    <select id="testSelect4" resultMap="User">
+        select * from user
+        <where>
+            <if test="!@com.zle.tools.StringTools@isNullOrEmpty(name)">
+
+                name = #{name}
+            </if>
+
+        </where>
+    </select>
+</mapper>
